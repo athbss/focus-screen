@@ -193,7 +193,7 @@ const App = () => {
   return (
       <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'} ${language === 'he' || language === 'ar' ? 'rtl' : 'ltr'}`}>
         {/* Left side */}
-        <div className="w-1/2 flex items-center justify-center bg-gray-800">
+        <div className="w-1/2 flex items-center justify-center bg-gray-800" style={{overflow: 'hidden'}}>
           <div className="w-full h-full">
             <Camera rotationAngle={rotationAngle} /> {/* העברת זווית הסיבוב ל-Camera */}
           </div>
