@@ -102,7 +102,7 @@ const App = () => {
     const intervalId = setInterval(() => {
       const now = new Date();
       setTime(showSeconds ? now.toLocaleTimeString('he-IL') : now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }));
-      setDate(now.toLocaleDateString('he-IL'));
+      setDate(now.toLocaleDateString('he-IL', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
     }, 1000);
 
     return () => clearInterval(intervalId);
@@ -190,6 +190,10 @@ const App = () => {
         .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }, []);
 
+  const openTaskInTodoist = (taskId) => {
+    window.open(`todoist://task?id=${taskId}`, '_blank');
+  };
+
   return (
       <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'} ${language === 'he' || language === 'ar' ? 'rtl' : 'ltr'}`}>
         {/* Left side */}
@@ -246,7 +250,7 @@ const App = () => {
                     </div>
                   </div>
               )}
-              <h1 className="text-3xl font-bold text-center">{currentTask || 'אין משימה נוכחית'}</h1>
+              <h1 className="text-3xl font-bold text-center"   onClick={() => openTaskInTodoist(currentTaskObj.id)} >{currentTask || 'אין משימה נוכחית'}</h1>
               <div className="flex justify-center mt-1 text-gray-500 text-sm">
                 {/* שורה נוספת למידע נוסף בפונט קטן */}
                 <span className={` ${currentTaskObj.priorityColor}`}>

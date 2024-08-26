@@ -7,6 +7,7 @@ import { Flag } from 'lucide-react'; // או כל אייקון אחר שמתאי
 
 const TodoistTasks = ({ apiToken, refresh, onTaskSelect, language }) => {
     const [tasks, setTasks] = useState([]);
+    const [alltasks, setallTasks] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [error, setError] = useState(null);
 
@@ -41,12 +42,23 @@ const TodoistTasks = ({ apiToken, refresh, onTaskSelect, language }) => {
         try {
             const api = new TodoistApi(apiToken);
             const fetchedTasks = await api.getTasks({ filter: '(overdue | today) & (!assigned to: others)' });
+            const allfetchedTasks = await api.getTasks();
+
+            setallTasks(allfetchedTasks);
             setTasks(fetchedTasks);
+
             setError(null);
+            // debugger;
+
         } catch (err) {
             setError('Failed to fetch tasks. Please check your API token.');
             console.error(err);
         }
+    };
+
+    const getSubtasksObj = (task) => {
+        const subtasks = alltasks.filter((t) => t.parentId === task.id);
+        return subtasks;
     };
 
     const openTaskInTodoist = (taskId) => {
@@ -108,6 +120,7 @@ const TodoistTasks = ({ apiToken, refresh, onTaskSelect, language }) => {
                                     createdTimeAgo: createdTimeAgo,
                                     timeUntilDue: timeUntilDue,
                                     priorityColor: priorityColor,
+                                    subtasks: getSubtasksObj(task),
                                 }
 
                                 return (
@@ -117,16 +130,16 @@ const TodoistTasks = ({ apiToken, refresh, onTaskSelect, language }) => {
                                     >
                                         <div className="flex-grow">
           <span onClick={() => onTaskSelect(taskObject)} className="font-bold">
-            {parseTextWithoutLinks(task.content)}
+            {parseTextWithoutLinks(task.content)} {getSubtasksObj(task).length > 0 && "(" + getSubtasksObj(task).length + ")"}
           </span>
                                             <div className="text-sm text-gray-500 mt-1">
                                                 {/* שורה נוספת למידע נוסף בפונט קטן */}
                                                 <span className={` ${priorityColor}`}>
               <Flag size={16} className="inline" /> {/* אייקון תיעדוף */}
             </span>
-                                                {task.subtasks && task.subtasks.length > 0 && (
+                                                {getSubtasksObj(task) && getSubtasksObj(task).length > 0 && (
                                                     <span className="text-gray-500 mr-2">
-                תתי-משימות: {task.subtasks.length}
+                תתי-משימות: {getSubtasksObj(task).length}
               </span>
                                                 )}
                                                 {isOverdue && overdueDays > 0 && (
