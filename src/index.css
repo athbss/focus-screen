@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* הוסף כאן סגנונות נוספים אם נדרש */
+button, input, optgroup, select, textarea,label{
+    text-align: right;
+    direction: rtl;
+}
+
+.rtl
+{
+    text-align: right;
+    direction: rtl;
+}
