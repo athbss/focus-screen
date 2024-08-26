@@ -71,7 +71,7 @@ const TodoistTasks = ({ apiToken, refresh, onTaskSelect, language }) => {
             </div>
 
             {isOpen && (
-                <div className="mt-4">
+                <div className="mt-4" >
                     {error ? (
                         <p className="text-red-500">{error}</p>
                     ) : tasks.length === 0 ? (
@@ -157,7 +157,7 @@ const TodoistTasks = ({ apiToken, refresh, onTaskSelect, language }) => {
                                             onClick={() => openTaskInTodoist(task.id)}
                                             className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm ${isRTL ? 'mr-2' : 'ml-2'}`}
                                         >
-                                            פתח בטודואיסט
+                                            למשימה
                                         </button>
                                     </li>
                                 );

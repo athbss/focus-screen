@@ -18,6 +18,14 @@ import {
 } from 'lucide-react';
 
 const App = () => {
+
+  const [rotationAngle, setRotationAngle] = useState(0);
+
+  // פונקציה שמסובבת את המצלמה ב-90 מעלות
+  const rotateCamera = () => {
+    setRotationAngle((prevAngle) => (prevAngle + 90) % 360);
+  };
+
   const [showSettings, setShowSettings] = useState(false);
   const [showSeconds, setShowSeconds] = useState(() => JSON.parse(localStorage.getItem('showSeconds')) ?? true);
   const [darkMode, setDarkMode] = useState(() => JSON.parse(localStorage.getItem('darkMode')) ?? false);
@@ -62,6 +70,12 @@ const App = () => {
 
   useEffect(() => {
     localStorage.setItem('timerType', timerType);
+    if (timerType !== 'duration')
+    {
+      const endTime = new Date(`${new Date().toDateString()} ${timerEndTime}`);
+      const now = new Date();
+      setTimerDuration(Math.floor((endTime - now) / 1000) / 60);
+    }
   }, [timerType]);
 
   useEffect(() => {
@@ -181,18 +195,21 @@ const App = () => {
         {/* Left side */}
         <div className="w-1/2 flex items-center justify-center bg-gray-800">
           <div className="w-full h-full">
-            <Camera />
+            <Camera rotationAngle={rotationAngle} /> {/* העברת זווית הסיבוב ל-Camera */}
           </div>
         </div>
 
         {/* Right side - Camera */}
         <div className="w-1/2 p-8 flex flex-col justify-between relative">
-          <div className="">
+          <div className="flex">
             <button
                 onClick={() => setShowSettings(true)}
                 className=""
             >
               <SettingsIcon size={24} className="inline-block ml-2" />
+            </button>
+            <button onClick={rotateCamera} className="">
+              <RotateCw size={24} />
             </button>
           </div>
 
@@ -266,22 +283,42 @@ const App = () => {
             </div>
 
             <div className="text-8xl font-bold mb-2 text-center">{time}</div>
-            <div className="text-xl mb-4 text-center text-gray">{date}</div>
+            <div className="text-s, mb-12 text-center text-gray">{date}</div>
             {showTimer && (
                 <div className="mb-4">
-                  <div className="bg-gray-300 rounded-full h-2 mb-2">
+                  <div className="bg-gray-300 rounded-full mb-2 " style={{maxWidth: '500px', margin: 'auto' }}>
+
                     <div
-                        className="bg-blue-600 rounded-full h-2"
-                        style={{width: `${(timerTime / (timerDuration * 60)) * 100}%`}}
-                    ></div>
+                        className="bg-blue-600 rounded-full text-center"
+                        style={{width: `${(timerTime / (timerDuration * 60)) * 100}%`, transition: 'width 1s linear'}}
+                    >
+                      {((timerTime / (timerDuration * 60)) * 100).toFixed(2)}%
+                    </div>
                   </div>
-                  <div className="text-xl text-center text-gray-500">זמן שנותר: {formatTime(timerTime)}</div>
+                  <div className="text-xl mb-2 text-center text-gray-500 items-center justify-center flex">
+                  {timerRunning ? (
+                      <button
+                          onClick={pauseTimer}
+                          className=""
+                      >
+                        <Pause size={20} />
+                      </button>
+                  ) : (
+                      <button
+                          onClick={startTimer}
+                          className=""
+                      >
+                        <Play size={20} />
+                      </button>
+                  )}
+                  <span className="text-xl text-center text-gray-500 ml-4 mr-4">זמן שנותר: {formatTime(timerTime)}</span>
+                  </div>
                 </div>
             )}
           </div>
 
           {/* Todoist Tasks */}
-          <div className="mt-4">
+          <div className="mt-4" style={{ overflow: "scroll" }}>
             <TodoistTasks
                 apiToken={todoistApiToken}
                 refresh={refreshTodoistTasks}
@@ -289,6 +326,10 @@ const App = () => {
                 language={language}
             />
           </div>
+
+          <footer className="mt-4 text-sm text-center w-full text-gray-500" style={{position: 'absolute', bottom: '0'}}>
+            Made from the Israeli Desert by <a className="" href="https://amit-trabelsi.co.il" target="_blank">Amit Trabelsi</a>
+          </footer>
         </div>
         {/* Settings overlay */}
         {showSettings && (
