@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עמוד מפוצל עם מצלמה, שעון, משימה נוכחית, שעון עצר וטיימר</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            height: 100%;
+        }
+        .left, .right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .left {
+            background-color: #f0f0f0;
+            flex-direction: column;
+            position: relative;
+            padding: 20px;
+        }
+        .right {
+            background-color: #e0e0e0;
+            overflow: hidden;
+        }
+        #current-task-display {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            min-height: 1.5em;
+            word-wrap: break-word;
+            max-width: 80%;
+        }
+        #stopwatch {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        #clock {
+            font-size: 3em;
+            font-weight: bold;
+        }
+        #date {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+        #stopwatch, #timer {
+            display: none;
+            font-size: 1em;
+            color: #666;
+            margin-top: 10px;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 300px;
+        }
+        #timer {
+            position: relative;
+            height: 40px;
+        }
+        .timer-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .timer-text {
+            position: relative;
+            z-index: 1;
+        }
+        #camera {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        #settings-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        #settings {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 250px;
+        }
+        .setting-item {
+            margin-bottom: 10px;
+        }
+        .dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+        .dark-mode .left {
+            background-color: #222;
+        }
+        .dark-mode .right {
+            background-color: #444;
+        }
+        .dark-mode #settings {
+            background-color: #555;
+            color: #fff;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .left, .right {
+                flex: none;
+                height: 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="right">
+            <video id="camera" autoplay playsinline></video>
+        </div>
+        <div class="left">
+            <div id="current-task-display"></div>
+            <div id="stopwatch">
+                <span>שעון עצר: 00:00:00</span>
+            </div>
+            <div id="clock"></div>
+            <div id="date"></div>
+            <div id="timer">
+                <svg class="timer-progress" viewBox="0 0 300 40">
+                    <rect width="300" height="40" fill="#ddd" rx="20" ry="20"/>
+                    <rect width="300" height="40" fill="#6c757d" rx="20" ry="20">
+                        <animate attributeName="width" from="0" to="300" dur="60s" repeatCount="indefinite"/>
+                    </rect>
+                </svg>
+                <span class="timer-text">זמן שנותר: 00:00:00</span>
+            </div>
+            <div id="settings-icon">⚙️</div>
+            <div id="settings">
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="showSeconds"> הצג שניות
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="darkMode"> מצב כהה
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        שפה ולוקליזציה:
+                        <select id="locale">
+                            <option value="he-IL">עברית</option>
+                            <option value="en-US">English (US)</option>
+                            <option value="en-GB">English (UK)</option>
+                            <option value="fr-FR">Français</option>
+                            <option value="es-ES">Español</option>
+                            <option value="ar-SA">العربية</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label for="current-task">על מה אתה עובד עכשיו?</label>
+                    <input type="text" id="current-task" placeholder="הזן את המשימה הנוכחית">
+                </div>
+                <div class="setting-item">
+                    <button id="toggleStopwatch">הפעל/עצור שעון עצר</button>
+                </div>
+                <div class="setting-item">
+                    <label for="timerType">סוג טיימר:</label>
+                    <select id="timerType">
+                        <option value="duration">משך זמן</option>
+                        <option value="specific">שעה מסוימת</option>
+                    </select>
+                </div>
+                <div id="durationTimerSettings" class="setting-item">
+                    <label for="timerDuration">משך הטיימר (בדקות):</label>
+                    <input type="number" id="timerDuration" min="1" value="5">
+                </div>
+                <div id="specificTimerSettings" class="setting-item" style="display:none;">
+                    <label for="timerTime">שעת סיום:</label>
+                    <input type="time" id="timerTime">
+                </div>
+                <div class="setting-item">
+                    <button id="startTimer">הפעל טיימר</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // הגדרות ברירת מחדל
+        let showSeconds = false;
+        let darkMode = false;
+        let locale = navigator.language;
+        let stopwatchInterval, timerInterval;
+        let stopwatchTime = 0, timerTime = 0;
+        let timerDuration = 5 * 60; // 5 דקות כברירת מחדל
+        let timerEndTime;
+
+        function applySettings() {
+            document.body.classList.toggle('dark-mode', darkMode);
+        }
+
+        // עדכון הגדרות
+        document.getElementById('showSeconds').addEventListener('change', (e) => {
+            showSeconds = e.target.checked;
+            updateClockAndDate();
+        });
+
+        document.getElementById('darkMode').addEventListener('change', (e) => {
+            darkMode = e.target.checked;
+            applySettings();
+        });
+
+        document.getElementById('locale').addEventListener('change', (e) => {
+            locale = e.target.value;
+            updateClockAndDate();
+        });
+
+        // שעון דיגיטלי ותאריך
+        function updateClockAndDate() {
+            const now = new Date();
+            let timeOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
+            if (showSeconds) {
+                timeOptions.second = '2-digit';
+            }
+            const timeString = now.toLocaleTimeString(locale, timeOptions);
+            document.getElementById('clock').textContent = timeString;
+
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            const dateString = now.toLocaleDateString(locale, dateOptions);
+            document.getElementById('date').textContent = dateString;
+        }
+
+        setInterval(updateClockAndDate, 1000);
+        updateClockAndDate();
+        applySettings();
+
+        // מצלמת לקוח
+        async function setupCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const videoElement = document.getElementById('camera');
+                videoElement.srcObject = stream;
+            } catch (error) {
+                console.error('שגיאה בגישה למצלמה:', error);
+            }
+        }
+        setupCamera();
+
+        // הצגה והסתרה של תפריט ההגדרות
+        document.getElementById('settings-icon').addEventListener('click', () => {
+            const settings = document.getElementById('settings');
+            settings.style.display = settings.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // עדכון המשימה הנוכחית
+        document.getElementById('current-task').addEventListener('input', (e) => {
+            document.getElementById('current-task-display').textContent = e.target.value || "אין משימה נוכחית";
+        });
+
+        // פונקציות עזר
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            return [h, m, s].map(v => v < 10 ? "0" + v : v).join(":");
+        }
+
+        function setProgress(percent) {
+            const rect = document.querySelector('.timer-progress rect:nth-child(2)');
+            rect.setAttribute('width', percent * 3);
+        }
+
+        // שעון עצר
+        document.getElementById('toggleStopwatch').addEventListener('click', () => {
+            const stopwatchElement = document.getElementById('stopwatch');
+            if (stopwatchInterval) {
+                clearInterval(stopwatchInterval);
+                stopwatchInterval = null;
+                document.getElementById('toggleStopwatch').textContent = 'הפעל שעון עצר';
+                stopwatchElement.style.display = 'none';
+            } else {
+                stopwatchElement.style.display = 'block';
+                stopwatchInterval = setInterval(() => {
+                    stopwatchTime++;
+                    stopwatchElement.querySelector('span').textContent = `שעון עצר: ${formatTime(stopwatchTime)}`;
+                }, 1000);
+                document.getElementById('toggleStopwatch').textContent = 'עצור שעון עצר';
+            }
+        });
+
+        // טיימר
+        document.getElementById('timerType').addEventListener('change', (e) => {
+            document.getElementById('durationTimerSettings').style.display = e.target.value === 'duration' ? 'block' : 'none';
+            document.getElementById('specificTimerSettings').style.display = e.target.value === 'specific' ? 'block' : 'none';
+        });
+
+        document.getElementById('startTimer').addEventListener('click', () => {
+            const timerElement = document.getElementById('timer');
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                document.getElementById('startTimer').textContent = 'הפעל טיימר';
+                timerElement.style.display = 'none';
+                return;
+            }
+
+            const timerType = document.getElementById('timerType').value;
+            if (timerType === 'duration') {
+                timerDuration = document.getElementById('timerDuration').value * 60;
+                timerTime = timerDuration;
+                timerEndTime = new Date(Date.now() + timerDuration * 1000);
+            } else {
+                const [hours, minutes] = document.getElementById('timerTime').value.split(':');
+                timerEndTime = new Date();
+                timerEndTime.setHours(hours, minutes, 0, 0);
+                if (timerEndTime < new Date()) {
+                    timerEndTime.setDate(timerEndTime.getDate() + 1);
+                }
+                timerTime = Math.floor((timerEndTime - new Date()) / 1000);
+                timerDuration = timerTime;
+            }
+
+            timerElement.style.display = 'flex';
+            const timerAnimation = document.querySelector('.timer-progress rect:nth-child(2) animate');
+            timerAnimation.setAttribute('dur', `${timerDuration}s`);
+            timerAnimation.beginElement();
+
+            timerInterval = setInterval(() => {
+                if (timerTime > 0) {
+                    timerTime--;
+                    timerElement.querySelector('.timer-text').textContent = `זמן שנותר: ${formatTime(timerTime)}`;
+                    setProgress((timerDuration - timerTime) / timerDuration * 100);
+                } else {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    document.getElementById('startTimer').textContent = 'הפעל טיימר';
+                    timerElement.style.display = 'none';
+                    alert('הטיימר הסתיים!');
+                }
+            }, 1000);
+            document.getElementById('startTimer').textContent = 'עצור טיימר';
+        });
+    </script>
+</body>
+</html>
