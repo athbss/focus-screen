@@ -8,6 +8,8 @@ import  { getRelativeTime, isFuture } from './helper/functions';
 import { format, isToday, parseISO, compareAsc } from 'date-fns';
 import TogglIntegration from "./comp/toggl";
 import { Toaster } from 'react-hot-toast';
+import packageJson from '../package.json';
+
 
 
 // import { Settings as SettingsIcon, RefreshCw } from 'lucide-react';
@@ -29,7 +31,8 @@ import toggl from "./comp/toggl";
 
 
 const App = () => {
-
+console.log('App');
+console.log(packageJson)
   const [googleClientId, setGoogleClientId] = useState(() =>
       localStorage.getItem('googleClientId') || process.env.REACT_APP_GOOGLE_CLIENT_ID
   );
@@ -551,7 +554,7 @@ const App = () => {
           </div>
 
           <footer className="mt-4 text-sm text-center w-full text-gray-500" style={{position: 'absolute', bottom: '0'}}>
-            Made from the Israeli Desert by <a className="" href="https://amit-trabelsi.co.il" target="_blank">Amit Trabelsi</a>
+            {packageJson.version} | Made from the Israeli Desert by <a className="" href="https://amit-trabelsi.co.il" target="_blank">Amit Trabelsi</a>
           </footer>
         </div>
         {/* Settings overlay */}
