@@ -13,3 +13,7 @@ button, input, optgroup, select, textarea,label{
     text-align: right;
     direction: rtl;
 }
+
+body{
+    max-height: 100vh;
+}

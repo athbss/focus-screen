@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { TodoistApi } from '@doist/todoist-api-typescript';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import {ChevronDown, ChevronUp, Check, ListTodo, Calendar} from 'lucide-react';
 import { formatDistanceToNow, parseISO, differenceInDays, differenceInHours, format, startOfDay } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { Flag } from 'lucide-react'; // או כל אייקון אחר שמתאים לך
+import getRelativeTime from '../helper/functions';
 
 const TodoistTasks = ({ apiToken, refresh, onTaskSelect, language }) => {
     const [tasks, setTasks] = useState([]);
@@ -72,13 +73,12 @@ const TodoistTasks = ({ apiToken, refresh, onTaskSelect, language }) => {
     }
 
     return (
-        <div className={`bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 ${isRTL ? 'rtl' : 'ltr'}`}>
+        <div className={`bg-white shadow-md rounded px-4 pt-4 pb-4 mb-4 ${isRTL ? 'rtl' : 'ltr'}`}>
             <div
                 className="flex justify-center items-center cursor-pointer"
                 onClick={() => setIsOpen(!isOpen)}
             >
-
-                <h2 className="text-2xl font-bold">{tasks.length}  משימות פתוחות </h2>
+                <ListTodo className="mr-2 text-gray-500 ml-2" size={24} /><h2 className="text-2xl font-bold">{tasks.length}  משימות פתוחות </h2>
                 {isOpen ? <ChevronUp /> : <ChevronDown />}
             </div>
 
