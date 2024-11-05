@@ -27,8 +27,9 @@ const TogglIntegration = ({
     // ... הסטייטים הקיימים ...
     const [recentEntries, setRecentEntries] = useState([]);
     const [showRecentEntries, setShowRecentEntries] = useState(false);
-
-    const CORS_PROXY_URL = process.env.SERVER_URL;
+console.log('process.env', process);
+    const CORS_PROXY_URL = process.env.SERVER_URL || 'https://focus-bck-1028d4d71ae5.herokuapp.com/';
+    console.log('CORS_PROXY_URL', CORS_PROXY_URL);
 
     const fetchRecentEntries = async () => {
         try {
