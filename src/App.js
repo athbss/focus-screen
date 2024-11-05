@@ -31,8 +31,8 @@ import toggl from "./comp/toggl";
 
 
 const App = () => {
-console.log('App');
-console.log(packageJson)
+// console.log('App');
+// console.log(packageJson)
   const [googleClientId, setGoogleClientId] = useState(() =>
       localStorage.getItem('googleClientId') || process.env.REACT_APP_GOOGLE_CLIENT_ID
   );
