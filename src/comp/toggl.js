@@ -103,7 +103,10 @@ const TogglIntegration = ({
                 method: 'GET',
                 headers: {
                     'Authorization': 'Basic ' + btoa(`${togglApiToken}:api_token`),
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*', // הוספת הכותרת CORS
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS', // הוספת הכותרת CORS
+                    'Access-Control-Allow-Headers': 'content-type' // הוספת הכותרת CORS
                 }
             });
             if (!response.ok) throw new Error('Network response was not ok');
