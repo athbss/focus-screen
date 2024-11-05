@@ -1,6 +1,6 @@
 {
   "name": "adhd-standby-screen",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A React-based ADHD standby screen application with Todoist integration",
   "main": "src/index.js",
   "scripts": {

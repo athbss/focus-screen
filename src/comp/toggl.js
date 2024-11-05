@@ -28,12 +28,12 @@ const TogglIntegration = ({
     const [recentEntries, setRecentEntries] = useState([]);
     const [showRecentEntries, setShowRecentEntries] = useState(false);
 
-    const CORS_PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
+    const CORS_PROXY_URL = process.env.SERVER_URL;
 
     const fetchRecentEntries = async () => {
         try {
             const response = await fetch(
-                `${CORS_PROXY_URL}https://api.track.toggl.com/api/v9/me/time_entries`, {
+                `${CORS_PROXY_URL}api/v9/me/time_entries`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Basic ${btoa(`${togglApiToken}:api_token`)}`,
@@ -99,7 +99,7 @@ const TogglIntegration = ({
 
     const fetchProjects = async () => {
         try {
-            const response = await fetch(`${CORS_PROXY_URL}https://api.track.toggl.com/api/v9/workspaces/${workspaceId}/projects`, {
+            const response = await fetch(`${CORS_PROXY_URL}api/v9/workspaces/${workspaceId}/projects`, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Basic ' + btoa(`${togglApiToken}:api_token`),
@@ -119,7 +119,7 @@ const TogglIntegration = ({
 
     const fetchClients = async () => {
         try {
-            const response = await fetch(`${CORS_PROXY_URL}https://api.track.toggl.com/api/v9/workspaces/${workspaceId}/clients`, {
+            const response = await fetch(`${CORS_PROXY_URL}api/v9/workspaces/${workspaceId}/clients`, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Basic ' + btoa(`${togglApiToken}:api_token`),
@@ -233,7 +233,7 @@ const TogglIntegration = ({
 
     const checkForActiveTimer = async () => {
         try {
-            const response = await fetch(`${CORS_PROXY_URL}https://api.track.toggl.com/api/v9/me/time_entries/current`, {
+            const response = await fetch(`${CORS_PROXY_URL}api/v9/me/time_entries/current`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Basic ${btoa(`${togglApiToken}:api_token`)}`,
@@ -281,7 +281,7 @@ const TogglIntegration = ({
         }
 
         try {
-            const response = await fetch(`${CORS_PROXY_URL}https://api.track.toggl.com/api/v9/workspaces/${parseInt(workspaceId)}/time_entries`, {
+            const response = await fetch(`${CORS_PROXY_URL}api/v9/workspaces/${parseInt(workspaceId)}/time_entries`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Basic ${btoa(`${togglApiToken}:api_token`)}`,
@@ -333,7 +333,7 @@ const TogglIntegration = ({
 
     const stopTimer = async () => {
         try {
-            const response = await fetch(`${CORS_PROXY_URL}https://api.track.toggl.com/api/v9/workspaces/${workspaceId}/time_entries/${activeTimeEntryId}/stop`, {
+            const response = await fetch(`${CORS_PROXY_URL}api/v9/workspaces/${workspaceId}/time_entries/${activeTimeEntryId}/stop`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Basic ${btoa(`${togglApiToken}:api_token`)}`,
