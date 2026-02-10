@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@craco/craco": "^7.1.0",
-    "@doist/todoist-api-typescript": "^2.1.2",
+    "@doist/todoist-api-typescript": "^6.4.0",
     "@googleapis/calendar": "^9.7.9",
     "assert": "^2.1.0",
     "autoprefixer": "^10.4.20",
